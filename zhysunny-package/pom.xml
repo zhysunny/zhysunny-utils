@@ -20,6 +20,10 @@
         </dependency>
         <dependency>
             <groupId>com.zhysunny</groupId>
+            <artifactId>zhysunny-driver</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.zhysunny</groupId>
             <artifactId>zhysunny-io</artifactId>
         </dependency>
         <dependency>

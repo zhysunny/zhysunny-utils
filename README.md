@@ -7,6 +7,11 @@
 
 * 较散的一些工具类，包含集合、日期、字符串等工具
 
+## driver
+
+* 完善了database-driver模块的mysql、oracle
+* hive和phoenix驱动比较复杂，不好兼容关系型数据库，暂时不做
+
 ## io
 
 * 原工具包含excel、text、xml读写，zip压缩和解压，image加水印
