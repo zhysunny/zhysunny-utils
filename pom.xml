@@ -13,6 +13,7 @@
         <module>zhysunny-io</module>
         <module>zhysunny-net</module>
         <module>zhysunny-package</module>
+        <module>zhysunny-driver</module>
     </modules>
     <name>Zhysunny Utils</name>
     <description>公共工具类</description>
@@ -27,6 +28,11 @@
             <dependency>
                 <groupId>com.zhysunny</groupId>
                 <artifactId>zhysunny-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.zhysunny</groupId>
+                <artifactId>zhysunny-driver</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -47,6 +53,18 @@
                 <version>1.3</version>
             </dependency>
             <!-- common end -->
+            <!-- driver start -->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>5.1.47</version>
+            </dependency>
+            <dependency>
+                <groupId>com.oracle</groupId>
+                <artifactId>oracle-jdbc</artifactId>
+                <version>7</version>
+            </dependency>
+            <!-- driver end -->
             <!-- io start -->
             <dependency>
                 <groupId>org.apache.ant</groupId>
