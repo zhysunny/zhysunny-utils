@@ -1,24 +1,51 @@
 # 我的工具类
-# v1.0
 
-* 增加单元测试和Jacoco覆盖率
+该工程用于封装一些常用的方法，提供接口，以jar包的形式引用
 
 ## common
 
-* 较散的一些工具类，包含集合、日期、字符串等工具
+存放较散的一些工具类，例如集合、日期、字符串等工具
 
 ## driver
 
-* 完善了database-driver模块的mysql、oracle
-* hive和phoenix驱动比较复杂，不好兼容关系型数据库，暂时不做
+数据库驱动:mysql、oracle，主要用于表结构的操作
 
 ## io
 
-* 原工具包含excel、text、xml读写，zip压缩和解压，image加水印
-* 新增properties文件读写
-* 优化所有读写功能，新增通过注解的方式在文件和实体类之间交互
+用于对常见类型文件的操作
 
 ## net
 
-* 原工具包含ftp、sftp、ssh等操作
-* 简单优化了一下代码
+用于与linux服务器交互的工具
+
+# v1.0
+
+## common
+
+* 算术 com.zhysunny.common.arithmetic
+* 集合 com.zhysunny.common.collection
+* 日期、时间 com.zhysunny.common.date
+* 随机码 com.zhysunny.common.random
+* MD5 com.zhysunny.common.security
+* utils com.zhysunny.common.util
+* 增加单元测试和Jacoco覆盖率
+
+## driver
+
+* 支持mysql表结构的增删改
+* 支持oracle表结构的增删改
+
+## io
+
+* excel读写
+* image加水印
+* properties读写
+* text结构化文本读写
+* xml读写
+* zip压缩与解压缩
+
+## net
+
+* ftp上传下载
+* sftp上传下载
+* ssh发送命令
