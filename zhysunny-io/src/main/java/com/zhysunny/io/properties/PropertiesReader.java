@@ -104,7 +104,7 @@ public class PropertiesReader extends BaseReader {
                 if (value == null) {
                     // 使用默认值
                     value = propKey.defaultValue();
-                    if (value == null) {
+                    if (value == null || "".equals(value)) {
                         continue;
                     }
                 }
