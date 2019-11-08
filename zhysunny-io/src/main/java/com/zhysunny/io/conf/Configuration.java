@@ -120,8 +120,12 @@ public class Configuration {
                     throw new RuntimeException("配置文件加载异常：" + obj);
                 }
             } else if (obj.toString().endsWith(".properties")) {
-                Properties prop = new PropertiesReader(obj).getProp();
-                props.putAll(prop);
+                try {
+                    Properties prop = new PropertiesReader(obj).builder().getProp();
+                    props.putAll(prop);
+                } catch (Exception e) {
+                    throw new RuntimeException("配置文件加载异常：" + obj);
+                }
             } else {
                 throw new RuntimeException("资源配置文件只支持xml和properties");
             }
@@ -387,7 +391,7 @@ public class Configuration {
      * @throws Exception
      */
     public void toConstant(Class<? extends PropertiesConstant> clz) throws Exception {
-        PropertiesReader reader = new PropertiesReader(properties);
+        PropertiesReader reader = new PropertiesReader(getProps());
         reader.translate();
         reader.toConstant(clz);
         properties = null;
