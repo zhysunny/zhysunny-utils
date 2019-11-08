@@ -6,6 +6,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -31,7 +32,7 @@ public class MapToXml extends BaseAnyToXml {
             Element root = document.createElement(rootName);
             document.appendChild(root);
             root.appendChild(document.createTextNode("\n"));
-            Set<String> attributes = (Set<String>) rootMap.get(XmlReader.ATTRIBUTES);
+            Set<String> attributes = (Set<String>)rootMap.get(XmlReader.ATTRIBUTES);
             if (attributes != null && attributes.size() > 0) {
                 // 添加属性值
                 for (String attributeName : attributes) {
@@ -42,11 +43,7 @@ public class MapToXml extends BaseAnyToXml {
             appendChild(child, root, document);
             root.appendChild(document.createTextNode("\n"));
             // 开始写入xml
-            DOMSource source = new DOMSource(document);
-            StreamResult result = new StreamResult(out);
-            TransformerFactory transFactory = TransformerFactory.newInstance();
-            Transformer transformer = transFactory.newTransformer();
-            transformer.transform(source, result);
+            output(document, out);
         } catch (Exception e) {
             throw new Exception(e);
         }
@@ -66,12 +63,12 @@ public class MapToXml extends BaseAnyToXml {
             Node textNode = document.createTextNode(obj.toString());
             element.appendChild(textNode);
         } else if (obj instanceof List) {
-            List<Map<String, Object>> childList = (List<Map<String, Object>>) obj;
+            List<Map<String, Object>> childList = (List<Map<String, Object>>)obj;
             for (Map<String, Object> childMap : childList) {
                 String nodeName = childMap.get(XmlReader.ELEMENT).toString();
                 Element childNode = document.createElement(nodeName);
                 element.appendChild(childNode);
-                Set<String> attributes = (Set<String>) childMap.get(XmlReader.ATTRIBUTES);
+                Set<String> attributes = (Set<String>)childMap.get(XmlReader.ATTRIBUTES);
                 if (attributes != null && attributes.size() > 0) {
                     // 添加属性值
                     for (String attributeName : attributes) {
@@ -89,10 +86,11 @@ public class MapToXml extends BaseAnyToXml {
     @Override
     public void write(Writer out, Object... params) throws Exception {
         if (params != null && params.length > 0) {
-            Map<String, Object> rootMap = (Map<String, Object>) params[0];
+            Map<String, Object> rootMap = (Map<String, Object>)params[0];
             write(out, rootMap);
         } else {
             throw new IllegalArgumentException("参数不正确");
         }
     }
+
 }

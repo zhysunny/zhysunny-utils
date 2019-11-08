@@ -7,10 +7,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -74,18 +71,30 @@ public class ExcelReader extends BaseReader {
     public ExcelReader builder() throws Exception {
         try {
             String filePath = "";
-            if (names[0] instanceof URL) {
-                URL url = (URL)names[0];
+            Object resource = resources.get(0);
+            if (resource instanceof URL) {
+                URL url = (URL)resource;
                 if (url != null) {
                     filePath = url.toString();
                     is = url.openStream();
                 }
-            } else if (names[0] instanceof File) {
-                File file = (File)names[0];
+            } else if (resource instanceof File) {
+                File file = (File)resource;
                 if (file.exists()) {
                     filePath = file.getName();
                     is = new FileInputStream(file);
                 }
+            } else if (resource instanceof String) {
+                filePath = (String)resource;
+                File file = new File(filePath);
+                URL url = Thread.currentThread().getContextClassLoader().getResource(filePath);
+                if (url != null) {
+                    is = url.openStream();
+                } else {
+                    is = new FileInputStream(file);
+                }
+            } else {
+                throw new RuntimeException("不支持的资源配置类型：" + resource.getClass());
             }
             if (filePath.endsWith(".xls")) {
                 wb = new HSSFWorkbook(is);

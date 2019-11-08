@@ -2,6 +2,9 @@ package com.zhysunny.io;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 文件读取基类
@@ -11,26 +14,25 @@ import java.net.URL;
 public abstract class BaseReader {
 
     /**
-     * 输入实例，支持URL，InputStream，File，String(转成File)
+     * 输入实例，支持URL，InputStream，File，String(File或URL)
      */
-    protected Object[] names;
+    protected List<Object> resources;
 
-    protected BaseReader(File file) {
-        names = new Object[1];
-        this.names[0] = file;
+    protected BaseReader(Object... resources) {
+        this.resources = new ArrayList<>();
+        addResource(resources);
     }
 
-    protected BaseReader(String path) {
-        this(new File(path));
+    protected BaseReader(List<Object> resources) {
+        this.resources = resources;
     }
 
-    protected BaseReader(URL url) {
-        names = new Object[1];
-        this.names[0] = url;
-    }
-
-    protected BaseReader(Object... names) {
-        this.names = names;
+    public void addResource(Object... resources) {
+        if (resources != null && resources.length > 0) {
+            for (Object resource : resources) {
+                this.resources.add(resource);
+            }
+        }
     }
 
     /**

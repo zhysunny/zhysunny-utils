@@ -1,11 +1,12 @@
 package com.zhysunny.io.properties;
 
 import com.zhysunny.io.BaseReader;
-
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -20,35 +21,42 @@ public class PropertiesReader extends BaseReader {
 
     private Properties prop;
 
-    public PropertiesReader(File file) {
-        super(file);
+    public PropertiesReader(Object... resources) {
+        super(resources);
     }
 
-    public PropertiesReader(String path) {
-        super(path);
+    public PropertiesReader(List<Object> resources) {
+        super(resources);
     }
 
-    public PropertiesReader(URL url) {
-        super(url);
-    }
-
-    public PropertiesReader(Object... names) {
-        super(names);
+    public PropertiesReader(Properties prop) {
+        this.prop = prop;
     }
 
     @Override
     public PropertiesReader builder() throws Exception {
         try {
             prop = new Properties();
-            for (Object name : names) {
-                if (name instanceof URL) {
-                    URL url = (URL)name;
+            for (Object resource : resources) {
+                if (resource instanceof URL) {
+                    URL url = (URL)resource;
                     prop.load(url.openStream());
-                } else if (name instanceof File) {
-                    File file = (File)name;
-                    if (file.exists()) {
+                } else if (resource instanceof File) {
+                    File file = (File)resource;
+                    prop.load(new FileInputStream(file));
+                } else if (resource instanceof String) {
+                    File file = new File((String)resource);
+                    URL url = Thread.currentThread().getContextClassLoader().getResource((String)resource);
+                    if (url != null) {
+                        prop.load(url.openStream());
+                    } else {
                         prop.load(new FileInputStream(file));
                     }
+                } else if (resource instanceof InputStream) {
+                    InputStream is = (InputStream)resource;
+                    prop.load(is);
+                } else {
+                    throw new RuntimeException("不支持的资源配置类型：" + resource.getClass());
                 }
             }
         } catch (Exception e) {
@@ -60,7 +68,7 @@ public class PropertiesReader extends BaseReader {
 
     private static final Pattern PATTERN = Pattern.compile("\\$\\{([^\\}]+)\\}");
 
-    private void translate() {
+    public void translate() {
         Matcher matcher = null;
         for (Map.Entry<Object, Object> entry : prop.entrySet()) {
             if (entry.getKey() == null || entry.getValue() == null) {

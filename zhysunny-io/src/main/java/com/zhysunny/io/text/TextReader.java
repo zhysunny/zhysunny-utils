@@ -82,16 +82,30 @@ public class TextReader extends BaseReader {
 
     @Override
     public TextReader builder() throws Exception {
-        if (names[0] instanceof URL) {
-            URL url = (URL) names[0];
+        Object resource = resources.get(0);
+        if (resource instanceof URL) {
+            URL url = (URL)resource;
             if (url != null) {
                 br = new BufferedReader(new InputStreamReader(url.openStream()));
             }
-        } else if (names[0] instanceof File) {
-            File file = (File) names[0];
+        } else if (resource instanceof File) {
+            File file = (File)resource;
             if (file.exists()) {
                 br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
             }
+        } else if (resource instanceof String) {
+            File file = new File((String)resource);
+            URL url = Thread.currentThread().getContextClassLoader().getResource((String)resource);
+            if (url != null) {
+                br = new BufferedReader(new InputStreamReader(url.openStream()));
+            } else {
+                br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            }
+        } else if (resource instanceof InputStream) {
+            InputStream is = (InputStream)resource;
+            br = new BufferedReader(new InputStreamReader(is));
+        } else {
+            throw new RuntimeException("不支持的资源配置类型：" + resource.getClass());
         }
         if (this.hasHead) {
             String line = br.readLine();
@@ -125,7 +139,7 @@ public class TextReader extends BaseReader {
             }
             String[] data = line.split(this.split, -1);
             Object read = baseTextToAny.read(data, params);
-            list.add((T) read);
+            list.add((T)read);
             if (list.size() == batch) {
                 break;
             }

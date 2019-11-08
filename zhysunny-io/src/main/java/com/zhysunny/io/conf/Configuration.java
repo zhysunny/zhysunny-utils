@@ -16,39 +16,22 @@
 
 package com.zhysunny.io.conf;
 
-import com.zhysunny.io.properties.AbstractTypeConversion;
-import com.zhysunny.io.properties.PropKey;
 import com.zhysunny.io.properties.PropertiesConstant;
-import org.w3c.dom.*;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+import com.zhysunny.io.properties.PropertiesReader;
+import com.zhysunny.io.xml.XmlReader;
+import com.zhysunny.io.xml.reader.XmlToConfiguration;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.*;
 
 /**
- * 独立的配置类，不依赖其他模块
  * 可以读写xml和properties文件配置，分为默认配置与最终配置
  * @author 章云
  * @date 2019/7/30 8:55
  */
 public class Configuration {
 
-    /**
-     * 默认资源:hadoop-default.xml
-     */
     private ArrayList<Object> defaultResources = new ArrayList<Object>();
-    /**
-     * 最终资源:hadoop-site.xml
-     */
     private ArrayList<Object> finalResources = new ArrayList<Object>();
     /**
      * 配置集合
@@ -59,67 +42,50 @@ public class Configuration {
      */
     private ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
-    /**
-     * 实例化新的对象
-     */
-    public Configuration() {
-        addDefaultResource("properties/input.properties");
-        addDefaultResource("properties/output.properties");
+    private static class Inner {
+
+        public static final Configuration INSTANCE = new Configuration();
+
     }
 
     /**
-     * 配置映射到常量类
+     * 单例
      */
-    private Class<? extends PropertiesConstant> clz;
-
-    public Configuration(Class<? extends PropertiesConstant> clz) {
-        this();
-        this.clz = clz;
-        getProps();
+    private Configuration() {
     }
 
-    /**
-     * 从另一个复制具有相同设置的新配置。
-     * @param other
-     */
-    public Configuration(Configuration other) {
-        this.defaultResources = (ArrayList<Object>)other.defaultResources.clone();
-        this.finalResources = (ArrayList<Object>)other.finalResources.clone();
-        if (other.properties != null) {
-            this.properties = (Properties)other.properties.clone();
-        }
+    public static Configuration getInstance() {
+        return Inner.INSTANCE;
     }
 
-    /**
-     * 添加默认资源。
-     * @param name
-     */
-    public void addDefaultResource(String name) {
+    public Configuration addDefaultResource(String name) {
         addResource(defaultResources, name);
+        return this;
     }
 
-    /**
-     * 添加默认资源。
-     * @param file
-     */
-    public void addDefaultResource(File file) {
+    public Configuration addDefaultResource(File file) {
         addResource(defaultResources, file);
+        return this;
     }
 
-    /**
-     * 添加最终资源。
-     * @param name
-     */
-    public void addFinalResource(String name) {
+    public Configuration addDefaultResource(URL url) {
+        addResource(defaultResources, url);
+        return this;
+    }
+
+    public Configuration addFinalResource(String name) {
         addResource(finalResources, name);
+        return this;
     }
 
-    /**
-     * 添加最终资源。
-     * @param file
-     */
-    public void addFinalResource(File file) {
+    public Configuration addFinalResource(File file) {
         addResource(finalResources, file);
+        return this;
+    }
+
+    public Configuration addFinalResource(URL url) {
+        addResource(finalResources, url);
+        return this;
     }
 
     /**
@@ -130,6 +96,36 @@ public class Configuration {
     private synchronized void addResource(ArrayList<Object> resources, Object resource) {
         resources.add(resource);
         properties = null;
+    }
+
+    public Configuration builder() {
+        properties = new Properties();
+        loadResources(properties, defaultResources);
+        loadResources(properties, finalResources);
+        return this;
+    }
+
+    /**
+     * 加载xml配置到Properties
+     * @param props
+     * @param resources
+     */
+    private void loadResources(Properties props, ArrayList<Object> resources) {
+        for (Object obj : resources) {
+            if (obj.toString().endsWith(".xml")) {
+                try {
+                    Properties prop = (Properties)new XmlReader(obj).read(new XmlToConfiguration());
+                    props.putAll(prop);
+                } catch (Exception e) {
+                    throw new RuntimeException("配置文件加载异常：" + obj);
+                }
+            } else if (obj.toString().endsWith(".properties")) {
+                Properties prop = new PropertiesReader(obj).getProp();
+                props.putAll(prop);
+            } else {
+                throw new RuntimeException("资源配置文件只支持xml和properties");
+            }
+        }
     }
 
     /**
@@ -348,210 +344,14 @@ public class Configuration {
     }
 
     /**
-     * 将name属性的值设置为类的名称。首先检查类是否实现了命名接口。
-     * @param name
-     * @param theClass
-     * @param xface
-     */
-    public void setClass(String name, Class theClass, Class xface) {
-        if (!xface.isAssignableFrom(theClass)) {
-            throw new RuntimeException(theClass + " not " + xface.getName());
-        }
-        set(name, theClass.getName());
-    }
-
-    /**
-     * 返回name属性的值对应的数组，数组元素是目录<br/>
-     * 如果name属性的值包含多个目录，则根据path's hash code选择一个目录。<br/>
-     * 如果所选目录不存在，则尝试创建它。
-     * @param name
-     * @param path
-     * @return
-     * @throws IOException
-     */
-    public File getFile(String name, String path) throws IOException {
-        String[] dirs = getStrings(name);
-        int hashCode = path.hashCode();
-        for (int i = 0; i < dirs.length; i++) {
-            // i & Integer.MAX_VALUE = i
-            // 相当于优先获得与path的hashCode一样值的索引
-            int index = (hashCode + i & Integer.MAX_VALUE) % dirs.length;
-            File file = new File(dirs[index], path).getAbsoluteFile();
-            File dir = file.getParentFile();
-            if (dir.exists() || dir.mkdirs()) {
-                // 只返回path对应的文件或目录
-                return file;
-            }
-        }
-        throw new IOException("No valid local directories in property: " + name);
-    }
-
-    /**
-     * 返回指定资源的URL。
-     * @param name
-     * @return
-     */
-    public URL getResource(String name) {
-        return classLoader.getResource(name);
-    }
-
-    /**
      * 获得配置集合对象
      * @return
      */
     private synchronized Properties getProps() {
         if (properties == null) {
-            Properties newProps = new Properties();
-            loadResources(newProps, defaultResources, false, false);
-            loadResources(newProps, finalResources, true, true);
-            properties = newProps;
-            if (clz != null) {
-                try {
-                    toConstant();
-                } catch (Exception e) {
-                    throw new RuntimeException("Properties to Constant exception", e);
-                }
-            }
+            builder();
         }
         return properties;
-    }
-
-    /**
-     * 加载xml配置到Properties
-     * @param props
-     * @param resources
-     * @param reverse   xml集合是否反序加载
-     * @param quiet     是否沉默，true的话加载不到xml不会抛异常
-     */
-    private void loadResources(Properties props, ArrayList<Object> resources, boolean reverse, boolean quiet) {
-        ListIterator i = resources.listIterator(reverse ? resources.size() : 0);
-        while (reverse ? i.hasPrevious() : i.hasNext()) {
-            loadResource(props, reverse ? i.previous() : i.next(), quiet);
-        }
-    }
-
-    /**
-     * 加载xml配置到Properties
-     * @param properties
-     * @param name
-     * @param quiet      是否沉默，true的话加载不到xml不会抛异常
-     */
-    private void loadResource(Properties properties, Object name, boolean quiet) {
-        try {
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document doc = null;
-            if (name instanceof String) {
-                // a CLASSPATH resource
-                URL url = getResource((String)name);
-                if (url != null) {
-                    if (url.toString().endsWith(".properties")) {
-                        properties.load(url.openStream());
-                        return;
-                    }
-                    doc = builder.parse(url.toString());
-                }
-            } else if (name instanceof File) {
-                // a file resource
-                File file = (File)name;
-                if (file.exists()) {
-                    if (file.getName().endsWith(".properties")) {
-                        properties.load(new FileInputStream(file));
-                        return;
-                    }
-                    doc = builder.parse(file);
-                }
-            }
-            if (doc == null) {
-                if (quiet) {
-                    return;
-                }
-                throw new RuntimeException(name + " not found");
-            }
-
-            Element root = doc.getDocumentElement();
-            if (!"configuration".equals(root.getTagName())) {
-                System.err.println("bad conf file: top-level element not <configuration>");
-            }
-            NodeList props = root.getChildNodes();
-            for (int i = 0; i < props.getLength(); i++) {
-                Node propNode = props.item(i);
-                if (!(propNode instanceof Element)) {
-                    continue;
-                }
-                Element prop = (Element)propNode;
-                if (!"property".equals(prop.getTagName())) {
-                    System.err.println("bad conf file: element not <property>");
-                }
-                NodeList fields = prop.getChildNodes();
-                String attr = null;
-                String value = null;
-                for (int j = 0; j < fields.getLength(); j++) {
-                    Node fieldNode = fields.item(j);
-                    if (!(fieldNode instanceof Element)) {
-                        continue;
-                    }
-                    Element field = (Element)fieldNode;
-                    if ("name".equals(field.getTagName())) {
-                        attr = ((Text)field.getFirstChild()).getData();
-                    }
-                    if ("value".equals(field.getTagName()) && field.hasChildNodes()) {
-                        value = ((Text)field.getFirstChild()).getData();
-                    }
-                }
-                if (attr != null && value != null) {
-                    properties.setProperty(attr, value);
-                }
-            }
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    /**
-     * 在此配置中写入非默认属性。
-     * @param out
-     * @throws IOException
-     */
-    public void write(OutputStream out) {
-        Properties properties = getProps();
-        try {
-            Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            Element conf = doc.createElement("configuration");
-            doc.appendChild(conf);
-            conf.appendChild(doc.createTextNode("\n"));
-            for (Enumeration e = properties.keys(); e.hasMoreElements(); ) {
-                String name = (String)e.nextElement();
-                Object object = properties.get(name);
-                String value = null;
-                if (object instanceof String) {
-                    value = (String)object;
-                } else {
-                    continue;
-                }
-                Element propNode = doc.createElement("property");
-                conf.appendChild(propNode);
-
-                Element nameNode = doc.createElement("name");
-                nameNode.appendChild(doc.createTextNode(name));
-                propNode.appendChild(nameNode);
-
-                Element valueNode = doc.createElement("value");
-                valueNode.appendChild(doc.createTextNode(value));
-                propNode.appendChild(valueNode);
-
-                conf.appendChild(doc.createTextNode("\n"));
-            }
-
-            DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(out);
-            TransformerFactory transFactory = TransformerFactory.newInstance();
-            Transformer transformer = transFactory.newTransformer();
-            transformer.transform(source, result);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
@@ -581,58 +381,16 @@ public class Configuration {
         }
     }
 
-    private void toConstant() throws Exception {
-        PropertiesConstant constant = clz.newInstance();
-        Field[] fields = clz.getFields();
-        for (Field field : fields) {
-            field.setAccessible(true);
-            PropKey propKey = field.getAnnotation(PropKey.class);
-            if (propKey != null) {
-                String key = propKey.key();
-                String value = properties.getProperty(key);
-                if (value == null) {
-                    // 使用默认值
-                    value = propKey.defaultValue();
-                    if (value == null) {
-                        continue;
-                    }
-                }
-                if (field.getType() == String.class) {
-                    field.set(constant, value);
-                } else if (field.getType() == Boolean.class || field.getType() == boolean.class) {
-                    field.setBoolean(constant, Boolean.parseBoolean(value));
-                } else if (field.getType() == Byte.class || field.getType() == byte.class) {
-                    field.setByte(constant, Byte.parseByte(value));
-                } else if (field.getType() == Short.class || field.getType() == short.class) {
-                    field.setShort(constant, Short.parseShort(value));
-                } else if (field.getType() == Integer.class || field.getType() == int.class) {
-                    field.setInt(constant, Integer.parseInt(value));
-                } else if (field.getType() == Long.class || field.getType() == long.class) {
-                    field.setLong(constant, Long.parseLong(value));
-                } else if (field.getType() == Float.class || field.getType() == float.class) {
-                    field.setFloat(constant, Float.parseFloat(value));
-                } else if (field.getType() == Double.class || field.getType() == double.class) {
-                    field.setDouble(constant, Double.parseDouble(value));
-                } else if (field.getType() == Character.class || field.getType() == char.class) {
-                    field.setChar(constant, value.charAt(0));
-                } else if (propKey.classpath().length() > 0) {
-                    AbstractTypeConversion typeConversion = (AbstractTypeConversion)Class.forName(propKey.classpath())
-                    .getConstructor(String.class).newInstance(propKey.param());
-                    field.set(constant, typeConversion.conversion(value));
-                } else {
-                    throw new Exception("支持八大基本数据类型和String类型的字段映射,或者继承TypeConversion并设置classpath参数");
-                }
-            }
-        }
-    }
-
     /**
-     * 初始化当前类，并打印所有配置信息到控制台
-     * @param args
+     * 将配置转入常量类
+     * @param clz
      * @throws Exception
      */
-    public static void main(String[] args) throws Exception {
-        new Configuration().write(System.out);
+    public void toConstant(Class<? extends PropertiesConstant> clz) throws Exception {
+        PropertiesReader reader = new PropertiesReader(properties);
+        reader.translate();
+        reader.toConstant(clz);
+        properties = null;
     }
 
 }

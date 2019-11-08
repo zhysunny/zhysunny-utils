@@ -34,16 +34,8 @@ public class XmlReader extends BaseReader {
      */
     private Document document;
 
-    public XmlReader(File file) {
-        super(file);
-    }
-
-    public XmlReader(String path) {
-        super(path);
-    }
-
-    public XmlReader(URL url) {
-        super(url);
+    public XmlReader(Object resource) {
+        super(resource);
     }
 
     /**
@@ -64,16 +56,27 @@ public class XmlReader extends BaseReader {
                     throw new UnsupportedOperationException(e);
                 }
                 DocumentBuilder builder = docBuilderFactory.newDocumentBuilder();
-                if (names[0] instanceof URL) {
-                    URL url = (URL) names[0];
+                // xml文件一次只加载一个
+                Object resource = resources.get(0);
+                if (resource instanceof URL) {
+                    URL url = (URL)resource;
+                    document = builder.parse(url.toString());
+                } else if (resource instanceof File) {
+                    File file = (File)resource;
+                    document = builder.parse(file);
+                } else if (resource instanceof String) {
+                    File file = new File((String)resource);
+                    URL url = Thread.currentThread().getContextClassLoader().getResource((String)resource);
                     if (url != null) {
                         document = builder.parse(url.toString());
-                    }
-                } else if (names[0] instanceof File) {
-                    File file = (File) names[0];
-                    if (file.exists()) {
+                    } else {
                         document = builder.parse(file);
                     }
+                } else if (resource instanceof InputStream) {
+                    InputStream is = (InputStream)resource;
+                    document = builder.parse(is);
+                } else {
+                    throw new RuntimeException("不支持的资源配置类型：" + resource.getClass());
                 }
             } catch (Exception e) {
                 throw new Exception(e);
@@ -95,7 +98,7 @@ public class XmlReader extends BaseReader {
      * @throws Exception
      */
     public Map<String, Object> read() throws Exception {
-        return (Map<String, Object>) read(new XmlToMap());
+        return (Map<String, Object>)read(new XmlToMap());
     }
 
     /**
@@ -108,7 +111,7 @@ public class XmlReader extends BaseReader {
         if (!XmlBean.class.isAssignableFrom(clz)) {
             throw new Exception(clz.getSimpleName() + " 没有实现 " + XmlBean.class);
         }
-        return (T) read(new XmlToBean(), clz);
+        return (T)read(new XmlToBean(), clz);
     }
 
     /**

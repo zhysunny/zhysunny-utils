@@ -34,7 +34,7 @@ public class ConfigurationTest {
 
     @Test
     public void testMain() throws Exception {
-        new Configuration(Constant.class);
+//        new Configuration(Constant.class);
         System.out.println(Constant.value);
         System.out.println(Constant.value1);
         System.out.println(Constant.value2);
