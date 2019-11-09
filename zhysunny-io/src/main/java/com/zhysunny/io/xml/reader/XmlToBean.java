@@ -1,8 +1,6 @@
 package com.zhysunny.io.xml.reader;
 
-import com.zhysunny.io.xml.XmlBean;
 import com.zhysunny.io.xml.XmlReader;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
