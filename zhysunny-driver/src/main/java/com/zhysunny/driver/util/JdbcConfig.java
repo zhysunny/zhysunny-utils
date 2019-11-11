@@ -23,6 +23,14 @@ public class JdbcConfig {
         this.jdbcPassword = jdbcPassword;
     }
 
+    public JdbcConfig(String[] array) {
+        setClassName(array[0]);
+        this.className = array[0];
+        this.jdbcUrl = array[1];
+        this.jdbcUsername = array[2];
+        this.jdbcPassword = array[3];
+    }
+
     public JdbcConfig(Constants.Driver driver, String jdbcUrl, String jdbcUsername, String jdbcPassword) {
         setClassName(driver.getClassName());
         this.jdbcUrl = jdbcUrl;
@@ -81,12 +89,7 @@ public class JdbcConfig {
 
     @Override
     public String toString() {
-        return "JdbcConfig{" +
-                "thisDriver='" + thisDriver + '\'' +
-                ", className='" + className + '\'' +
-                ", jdbcUrl='" + jdbcUrl + '\'' +
-                ", jdbcUsername='" + jdbcUsername + '\'' +
-                ", jdbcPassword='" + jdbcPassword + '\'' +
-                '}';
+        return "JdbcConfig{" + "thisDriver='" + thisDriver + '\'' + ", className='" + className + '\'' + ", jdbcUrl='" + jdbcUrl + '\''
+        + ", jdbcUsername='" + jdbcUsername + '\'' + ", jdbcPassword='" + jdbcPassword + '\'' + '}';
     }
 }

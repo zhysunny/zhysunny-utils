@@ -127,6 +127,9 @@ public class Column {
                 this.field = fieldType.getTimeField();
             } else if (this.type.equalsIgnoreCase(Constants.DATETIME)) {
                 this.field = fieldType.getDatetimeField();
+            } else {
+                // 字符串是默认类型
+                this.field = fieldType.getStringField();
             }
         }
     }
