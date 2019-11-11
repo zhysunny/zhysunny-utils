@@ -20,7 +20,7 @@ import java.util.Map;
  * @author 章云
  * @date 2019/7/25 17:41
  */
-public class ExcelReader extends BaseReader {
+public class ExcelReader extends BaseReader implements Closeable {
 
     /**
      * 工作簿
@@ -234,19 +234,20 @@ public class ExcelReader extends BaseReader {
     /**
      * 关闭资源
      */
-    public void close() throws Exception {
+    @Override
+    public void close() {
         if (is != null) {
             try {
                 is.close();
             } catch (IOException e) {
-                throw new Exception(e);
+                throw new RuntimeException(e);
             }
         }
         if (wb != null) {
             try {
                 wb.close();
             } catch (IOException e) {
-                throw new Exception(e);
+                throw new RuntimeException(e);
             }
         }
     }

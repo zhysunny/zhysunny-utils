@@ -16,7 +16,7 @@ import java.util.Map;
  * @author 章云
  * @date 2019/7/27 14:42
  */
-public class TextWriter extends BaseWriter {
+public class TextWriter extends BaseWriter implements Closeable {
 
     /**
      * 列分隔符,默认逗号
@@ -118,6 +118,7 @@ public class TextWriter extends BaseWriter {
      * 关闭流
      * @throws IOException
      */
+    @Override
     public void close() throws IOException {
         if (bw != null) {
             bw.close();
