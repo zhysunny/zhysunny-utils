@@ -26,22 +26,22 @@
         <dependencies>
             <!-- module start -->
             <dependency>
-                <groupId>com.zhysunny</groupId>
+                <groupId>${groupId}</groupId>
                 <artifactId>zhysunny-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.zhysunny</groupId>
+                <groupId>${groupId}</groupId>
                 <artifactId>zhysunny-driver</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.zhysunny</groupId>
+                <groupId>${groupId}</groupId>
                 <artifactId>zhysunny-io</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.zhysunny</groupId>
+                <groupId>${groupId}</groupId>
                 <artifactId>zhysunny-net</artifactId>
                 <version>${project.version}</version>
             </dependency>
