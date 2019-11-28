@@ -116,7 +116,11 @@ public class PropertiesReader extends BaseReader {
                         continue;
                     }
                 }
-                if (field.getType() == String.class) {
+                if (propKey.classpath().length() > 0) {
+                    AbstractTypeConversion typeConversion = (AbstractTypeConversion)Class.forName(propKey.classpath())
+                    .getConstructor(String.class).newInstance(propKey.param());
+                    field.set(t, typeConversion.conversion(value));
+                } else if (field.getType() == String.class) {
                     field.set(t, value);
                 } else if (field.getType() == Boolean.class || field.getType() == boolean.class) {
                     field.setBoolean(t, Boolean.parseBoolean(value));
@@ -134,10 +138,6 @@ public class PropertiesReader extends BaseReader {
                     field.setDouble(t, Double.parseDouble(value));
                 } else if (field.getType() == Character.class || field.getType() == char.class) {
                     field.setChar(t, value.charAt(0));
-                } else if (propKey.classpath().length() > 0) {
-                    AbstractTypeConversion typeConversion = (AbstractTypeConversion)Class.forName(propKey.classpath())
-                    .getConstructor(String.class).newInstance(propKey.param());
-                    field.set(t, typeConversion.conversion(value));
                 } else {
                     throw new Exception("支持八大基本数据类型和String类型的字段映射,或者继承TypeConversion并设置classpath参数");
                 }

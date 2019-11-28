@@ -70,9 +70,13 @@ public class PropertiesWriter extends BaseWriter {
             PropKey propKey = field.getAnnotation(PropKey.class);
             if (propKey != null) {
                 String key = propKey.key();
-                String value = null;
-                if (field.getType() == String.class) {
-                    value = (String) field.get(clz);
+                String value;
+                if (propKey.classpath().length() > 0) {
+                    AbstractTypeConversion typeConversion = (AbstractTypeConversion)Class.forName(propKey.classpath())
+                    .getConstructor(String.class).newInstance(propKey.param());
+                    value = typeConversion.toString(field.get(clz));
+                } else if (field.getType() == String.class) {
+                    value = (String)field.get(clz);
                 } else if (field.getType() == Boolean.class || field.getType() == boolean.class) {
                     value = String.valueOf(field.getBoolean(clz));
                 } else if (field.getType() == Byte.class || field.getType() == byte.class) {
@@ -89,9 +93,6 @@ public class PropertiesWriter extends BaseWriter {
                     value = String.valueOf(field.getDouble(clz));
                 } else if (field.getType() == Character.class || field.getType() == char.class) {
                     value = String.valueOf(field.getChar(clz));
-                } else if (propKey.classpath().length() > 0) {
-                    AbstractTypeConversion typeConversion = (AbstractTypeConversion) Class.forName(propKey.classpath()).getConstructor(String.class).newInstance(propKey.param());
-                    value = typeConversion.toString(field.get(clz));
                 } else {
                     throw new Exception("只支持八大基本数据类型和String类型的字段映射");
                 }
