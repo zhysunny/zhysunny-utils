@@ -22,7 +22,7 @@ public class HexadecimalUtils {
         if (number > 16 || number < 2) {
             throw new RuntimeException("请输入number为2到16以内的");
         }
-        List<Integer> list = new ArrayList<Integer>();
+        List<Integer> list = new ArrayList<>();
         int a = 0;
         while ((param / number) != 0) {
             a = param % number;
@@ -88,7 +88,7 @@ public class HexadecimalUtils {
     }
 
     private static Map<String, String> getMap() {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("10", "a");
         map.put("11", "b");
         map.put("12", "c");

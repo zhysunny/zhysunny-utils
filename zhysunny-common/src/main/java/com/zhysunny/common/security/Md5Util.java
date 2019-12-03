@@ -53,7 +53,7 @@ public class Md5Util {
         for (int i = mt.length - 1; i > -1; i--) {
             buffer.append((char) mt[i]);
         }
-        return buffer.substring(0, buffer.length() - 10).toString();
+        return buffer.substring(0, buffer.length() - 10);
     }
 
     /**
@@ -61,9 +61,9 @@ public class Md5Util {
      * @return md5串
      */
     public static String getFileMD5(File file) {
-        MessageDigest MD5;
+        MessageDigest md5;
         try {
-            MD5 = MessageDigest.getInstance("MD5");
+            md5 = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e1) {
             e1.printStackTrace();
             return null;
@@ -74,9 +74,9 @@ public class Md5Util {
             byte[] buffer = new byte[8192];
             int length;
             while ((length = fileInputStream.read(buffer)) != -1) {
-                MD5.update(buffer, 0, length);
+                md5.update(buffer, 0, length);
             }
-            return new String(Hex.encodeHex(MD5.digest()));
+            return new String(Hex.encodeHex(md5.digest()));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return null;
@@ -99,10 +99,10 @@ public class Md5Util {
      * @return md5串
      */
     public static String setFileMD5(File file) {
-        MessageDigest MD5;
+        MessageDigest md5;
         int filelimit = 2 * 1024;
         try {
-            MD5 = MessageDigest.getInstance("MD5");
+            md5 = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e1) {
             e1.printStackTrace();
             return null;
@@ -115,17 +115,17 @@ public class Md5Util {
             long filelength = file.length();
             if (filelength > filelimit) {
                 length = fileInputStream.read(buffer);
-                MD5.update(buffer);
+                md5.update(buffer);
                 length = fileInputStream.read(buffer);
-                MD5.update(buffer);
+                md5.update(buffer);
             } else {
                 while ((length = fileInputStream.read(buffer)) != -1) {
-                    MD5.update(buffer, 0, length);
+                    md5.update(buffer, 0, length);
                 }
             }
             byte[] b = String.valueOf(filelength).getBytes("UTF-8");
-            MD5.update(b);
-            return new String(Hex.encodeHex(MD5.digest()));
+            md5.update(b);
+            return new String(Hex.encodeHex(md5.digest()));
         } catch (IOException e) {
             e.printStackTrace();
             return null;

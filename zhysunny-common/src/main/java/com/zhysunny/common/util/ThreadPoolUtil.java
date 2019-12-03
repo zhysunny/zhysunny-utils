@@ -29,7 +29,7 @@ public class ThreadPoolUtil {
     /**
      * 实例对象
      */
-    private static ThreadPoolUtil instance;
+    private static volatile ThreadPoolUtil instance;
 
     /**
      * 线程池对象
@@ -169,20 +169,17 @@ public class ThreadPoolUtil {
         ThreadPoolUtil instance = ThreadPoolUtil.getInstance(10);
         for (int i = 0; i < 40; i++) {
             // 添加线程
-            instance.addThread(new Thread() {
-                @Override
-                public void run() {
-                    String name = Thread.currentThread().getName();
-                    System.out.println(name + " start ...");
-                    try {
-                        sleep(10000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    System.out.println(name + " end ...");
-                    System.out.println("---------------------------------");
+            instance.addThread(new Thread(() -> {
+                String name = Thread.currentThread().getName();
+                System.out.println(name + " start ...");
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            });
+                System.out.println(name + " end ...");
+                System.out.println("---------------------------------");
+            }));
             // 打印线程池状态信息
             System.out.println(instance.getMessage());
             Thread.sleep(900);

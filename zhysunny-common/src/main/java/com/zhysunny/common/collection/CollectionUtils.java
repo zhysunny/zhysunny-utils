@@ -19,9 +19,9 @@ public class CollectionUtils {
      * @return
      */
     public static <T> boolean equalsCollection(Collection<T> collection1, Collection<T> collection2) {
-        List<T> list1 = collection1.stream().filter(e -> e != null).collect(Collectors.toList());
+        List<T> list1 = collection1.stream().filter(Objects::nonNull).collect(Collectors.toList());
         Collections.sort(list1, null);
-        List<T> list2 = collection2.stream().filter(e -> e != null).collect(Collectors.toList());
+        List<T> list2 = collection2.stream().filter(Objects::nonNull).collect(Collectors.toList());
         Collections.sort(list2, null);
         if (list1.size() != list2.size()) {
             return false;

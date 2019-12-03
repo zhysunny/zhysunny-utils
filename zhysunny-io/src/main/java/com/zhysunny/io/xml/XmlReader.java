@@ -1,23 +1,16 @@
 package com.zhysunny.io.xml;
 
 import com.zhysunny.io.BaseReader;
-import com.zhysunny.io.properties.PropertiesConstant;
 import com.zhysunny.io.xml.reader.BaseXmlToAny;
 import com.zhysunny.io.xml.reader.XmlToBean;
 import com.zhysunny.io.xml.reader.XmlToMap;
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.*;
+import java.util.Map;
 
 /**
  * Xml读取类
@@ -50,11 +43,13 @@ public class XmlReader extends BaseReader {
                 DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
                 docBuilderFactory.setIgnoringComments(true);
                 docBuilderFactory.setNamespaceAware(true);
-                try {
-                    docBuilderFactory.setXIncludeAware(true);
-                } catch (UnsupportedOperationException e) {
-                    throw new UnsupportedOperationException(e);
-                }
+                // 这是优先选择. 如果不允许DTDs (doctypes) ,几乎可以阻止所有的XML实体攻击
+                docBuilderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+                docBuilderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+                docBuilderFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+                docBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+                docBuilderFactory.setExpandEntityReferences(false);
+                docBuilderFactory.setXIncludeAware(false);
                 DocumentBuilder builder = docBuilderFactory.newDocumentBuilder();
                 // xml文件一次只加载一个
                 Object resource = resources.get(0);
