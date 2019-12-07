@@ -21,7 +21,6 @@ import com.zhysunny.io.properties.PropertiesReader;
 import com.zhysunny.io.xml.XmlReader;
 import com.zhysunny.io.xml.reader.XmlToConfiguration;
 import java.io.File;
-import java.net.URL;
 import java.util.*;
 
 /**
