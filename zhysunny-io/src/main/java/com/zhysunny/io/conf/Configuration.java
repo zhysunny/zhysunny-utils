@@ -357,7 +357,7 @@ public class Configuration {
      * 获得配置集合对象
      * @return
      */
-    private synchronized Properties getProps() {
+    public synchronized Properties getProps() {
         if (properties == null) {
             builder();
         }
