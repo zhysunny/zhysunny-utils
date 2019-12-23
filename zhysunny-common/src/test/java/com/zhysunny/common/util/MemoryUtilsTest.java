@@ -33,9 +33,9 @@ public class MemoryUtilsTest {
     @Test
     public void testGetMemorySize() throws Exception {
         System.out.println(MemoryUtils.getMemorySize(false));
-        System.out.println(UnitUtils.getSizeUnit(Runtime.getRuntime().totalMemory()));
-        System.out.println(UnitUtils.getSizeUnit(Runtime.getRuntime().freeMemory()));
-        System.out.println(UnitUtils.getSizeUnit(Runtime.getRuntime().maxMemory()));
+        System.out.println(UnitUtils.getCapacityUnit(Runtime.getRuntime().totalMemory()));
+        System.out.println(UnitUtils.getCapacityUnit(Runtime.getRuntime().freeMemory()));
+        System.out.println(UnitUtils.getCapacityUnit(Runtime.getRuntime().maxMemory()));
     }
 
 }

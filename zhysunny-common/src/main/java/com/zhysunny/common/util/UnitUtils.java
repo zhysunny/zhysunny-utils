@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
  * @date 2019/7/27 15:30
  */
 public final class UnitUtils {
+
     private UnitUtils() {
     }
 
@@ -23,11 +24,12 @@ public final class UnitUtils {
     private static final DecimalFormat DF = new DecimalFormat(".00");
 
     /**
-     * 单位换算
-     * @param size
+     * 容量单位换算
+     * @param number
      * @return
      */
-    public static String getSizeUnit(double size, String unit) {
+    public static String getCapacityUnit(Number number, String unit) {
+        double size = number.doubleValue();
         double result;
         if ((null == unit && size > PB) || (unit != null && ("PB".equalsIgnoreCase(unit)) || "P".equalsIgnoreCase(unit))) {
             result = size / PB;
@@ -52,11 +54,11 @@ public final class UnitUtils {
 
     /**
      * 单位换算
-     * @param size
+     * @param number
      * @return
      */
-    public static String getSizeUnit(double size) {
-        return getSizeUnit(size, null);
+    public static String getCapacityUnit(Number number) {
+        return getCapacityUnit(number, null);
     }
 
     /**
@@ -64,7 +66,7 @@ public final class UnitUtils {
      * @param sizeUnit
      * @return
      */
-    public static double getSize(String sizeUnit) {
+    public static Number getCapacity(String sizeUnit) {
         double result = 0;
         Matcher m = PATTERN.matcher(sizeUnit);
         if (m.find()) {
@@ -141,9 +143,9 @@ public final class UnitUtils {
 
     public static void main(String[] args) {
         double d = 15651521354531D;
-        System.out.println(UnitUtils.getSizeUnit(d));
-        System.out.println(UnitUtils.getSizeUnit(d, "G"));
-        System.out.println(UnitUtils.getSize("1457.66 GB"));
+        System.out.println(UnitUtils.getCapacityUnit(d));
+        System.out.println(UnitUtils.getCapacityUnit(d, "G"));
+        System.out.println(UnitUtils.getCapacity("1457.66 GB"));
         System.out.println(UnitUtils.getNumberUnit(d));
         System.out.println(UnitUtils.getRateUnit(523, 1565));
     }
