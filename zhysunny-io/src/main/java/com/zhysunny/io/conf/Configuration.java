@@ -36,10 +36,6 @@ public class Configuration {
      * 配置集合
      */
     private Properties props;
-    /**
-     * 类加载器
-     */
-    private ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
     private static class Inner {
 
