@@ -21,7 +21,6 @@ import com.zhysunny.io.properties.PropertiesReader;
 import com.zhysunny.io.xml.XmlReader;
 import com.zhysunny.io.xml.reader.XmlToProperties;
 import java.io.File;
-import java.net.URL;
 import java.util.*;
 
 /**
@@ -31,8 +30,8 @@ import java.util.*;
  */
 public class Configuration {
 
-    private ArrayList<Object> defaultResources = new ArrayList<Object>();
-    private ArrayList<Object> finalResources = new ArrayList<Object>();
+    private List<Object> defaultResources = new ArrayList<>();
+    private List<Object> finalResources = new ArrayList<>();
     /**
      * 配置集合
      */
@@ -58,43 +57,33 @@ public class Configuration {
         return Inner.INSTANCE;
     }
 
-    public Configuration addDefaultResource(String name) {
-        addResource(defaultResources, name);
+    /**
+     * 支持String(File,URL),File,URL,InputStream
+     * @param resources
+     * @return
+     */
+    public Configuration addDefaultResource(Object... resources) {
+        addResource(defaultResources, resources);
         return this;
     }
 
-    public Configuration addDefaultResource(File file) {
-        addResource(defaultResources, file);
-        return this;
-    }
-
-    public Configuration addDefaultResource(URL url) {
-        addResource(defaultResources, url);
-        return this;
-    }
-
-    public Configuration addFinalResource(String name) {
-        addResource(finalResources, name);
-        return this;
-    }
-
-    public Configuration addFinalResource(File file) {
-        addResource(finalResources, file);
-        return this;
-    }
-
-    public Configuration addFinalResource(URL url) {
-        addResource(finalResources, url);
+    /**
+     * 支持String(File,URL),File,URL,InputStream
+     * @param resources
+     * @return
+     */
+    public Configuration addFinalResource(Object... resources) {
+        addResource(finalResources, resources);
         return this;
     }
 
     /**
      * 添加资源并初始化配置集合
+     * @param list
      * @param resources
-     * @param resource
      */
-    private synchronized void addResource(ArrayList<Object> resources, Object resource) {
-        resources.add(resource);
+    private synchronized void addResource(List<Object> list, Object... resources) {
+        Arrays.stream(resources).forEach(resource -> list.add(resource));
         props = null;
     }
 
@@ -110,7 +99,7 @@ public class Configuration {
      * @param props
      * @param resources
      */
-    private void loadResources(Properties props, ArrayList<Object> resources) {
+    private void loadResources(Properties props, List<Object> resources) {
         for (Object obj : resources) {
             if (obj.toString().endsWith(".xml")) {
                 try {
@@ -119,7 +108,7 @@ public class Configuration {
                 } catch (Exception e) {
                     throw new RuntimeException("配置文件加载异常：" + obj);
                 }
-            } else if (obj.toString().endsWith(".props")) {
+            } else if (obj.toString().endsWith(".properties")) {
                 try {
                     Properties prop = new PropertiesReader(obj).builder().getProps();
                     props.putAll(prop);
@@ -132,206 +121,227 @@ public class Configuration {
         }
     }
 
-    /**
-     * 返回name属性的值，如果不存在此类属性，则返回null。
-     * @param name
-     * @return
-     */
-    public Object getObject(String name) {
+    /************************* Object *******************/
+
+    public Object get(String name) {
         return getProps().get(name);
     }
 
-    /**
-     * 设置name属性的值。
-     * @param name
-     * @param value
-     */
-    public void setObject(String name, Object value) {
-        getProps().put(name, value);
-    }
-
-    /**
-     * 返回name属性的值。如果不存在此类属性，则返回defaultValue。
-     * @param name
-     * @param defaultValue
-     * @return
-     */
     public Object get(String name, Object defaultValue) {
-        Object res = getObject(name);
-        if (res != null) {
-            return res;
-        } else {
-            return defaultValue;
-        }
+        Object value = get(name);
+        return value == null ? defaultValue : value;
     }
 
-    /**
-     * 设置name属性的值。
-     * @param name
-     * @param value
-     */
-    public void set(String name, Object value) {
-        getProps().setProperty(name, value.toString());
+    /************************* String *******************/
+
+    public void set(String name, String value) {
+        setString(name, value);
     }
 
-    /**
-     * 返回name属性的值，如果不存在此类属性，则返回null。
-     * @param name
-     * @return
-     */
-    public String get(String name) {
+    public void setString(String name, String value) {
+        getProps().setProperty(name, value);
+    }
+
+    public String getString(String name) {
         return getProps().getProperty(name);
     }
 
-    /**
-     * 返回name属性的值。如果不存在此类属性，则返回defaultValue。
-     * @param name
-     * @param defaultValue
-     * @return
-     */
-    public String get(String name, String defaultValue) {
+    public String getString(String name, String defaultValue) {
         return getProps().getProperty(name, defaultValue);
     }
 
-    /**
-     * 以整数形式返回name属性的值。如果没有指定此类属性，或者指定的值不是有效整数，则返回defaultValue。
-     * @param name
-     * @param defaultValue
-     * @return
-     */
-    public int getInt(String name, int defaultValue) {
-        String valueString = get(name);
-        if (valueString == null) {
+    /************************* byte *******************/
+
+    public byte getByte(String name) {
+        return getByte(name, (byte)0);
+    }
+
+    public byte getByte(String name, byte defaultValue) {
+        String value = getString(name);
+        if (value == null) {
             return defaultValue;
         }
         try {
-            return Integer.parseInt(valueString);
+            return Byte.parseByte(value);
         } catch (NumberFormatException e) {
             return defaultValue;
         }
     }
 
-    /**
-     * 将name属性的值设置为整数。
-     * @param name
-     * @param value
-     */
+    public void setByte(String name, byte value) {
+        set(name, Byte.toString(value));
+    }
+
+    /************************* short *******************/
+
+    public short getShort(String name) {
+        return getShort(name, (short)0);
+    }
+
+    public short getShort(String name, short defaultValue) {
+        String value = getString(name);
+        if (value == null) {
+            return defaultValue;
+        }
+        try {
+            return Short.parseShort(value);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    public void setShort(String name, short value) {
+        set(name, Short.toString(value));
+    }
+
+    /************************* int *******************/
+
+    public int getInt(String name) {
+        return getInt(name, 0);
+    }
+
+    public int getInt(String name, int defaultValue) {
+        String value = getString(name);
+        if (value == null) {
+            return defaultValue;
+        }
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
     public void setInt(String name, int value) {
         set(name, Integer.toString(value));
     }
 
-    /**
-     * 以长整数形式返回name属性的值。如果没有指定此类属性，或者指定的值不是有效长整数，则返回defaultValue。
-     * @param name
-     * @param defaultValue
-     * @return
-     */
+    /************************* long *******************/
+
+    public long getLong(String name) {
+        return getLong(name, 0L);
+    }
+
     public long getLong(String name, long defaultValue) {
-        String valueString = get(name);
-        if (valueString == null) {
+        String value = getString(name);
+        if (value == null) {
             return defaultValue;
         }
         try {
-            return Long.parseLong(valueString);
+            return Long.parseLong(value);
         } catch (NumberFormatException e) {
             return defaultValue;
         }
     }
 
-    /**
-     * 将name属性的值设置为长整数。
-     * @param name
-     * @param value
-     */
     public void setLong(String name, long value) {
         set(name, Long.toString(value));
     }
 
-    /**
-     * 以单精度浮点型形式返回name属性的值。如果没有指定此类属性，或者指定的值不是有效单精度浮点型，则返回defaultValue。
-     * @param name
-     * @param defaultValue
-     * @return
-     */
+    /************************* float *******************/
+
+    public float getFloat(String name) {
+        return getFloat(name, 0.0f);
+    }
+
     public float getFloat(String name, float defaultValue) {
-        String valueString = get(name);
-        if (valueString == null) {
+        String value = getString(name);
+        if (value == null) {
             return defaultValue;
         }
         try {
-            return Float.parseFloat(valueString);
+            return Float.parseFloat(value);
         } catch (NumberFormatException e) {
             return defaultValue;
         }
     }
 
-    /**
-     * 以布尔型形式返回name属性的值。如果没有指定此类属性，或者指定的值不是有效布尔型，则返回defaultValue。
-     * @param name
-     * @param defaultValue
-     * @return
-     */
+    public void setFloat(String name, float value) {
+        set(name, Float.toString(value));
+    }
+
+    /************************* double *******************/
+    public double getDouble(String name) {
+        return getDouble(name, 0.0d);
+    }
+
+    public double getDouble(String name, double defaultValue) {
+        String value = getString(name);
+        if (value == null) {
+            return defaultValue;
+        }
+        try {
+            return Double.parseDouble(value);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    public void setDouble(String name, double value) {
+        set(name, Double.toString(value));
+    }
+
+    /************************* boolean *******************/
+    public boolean getBoolean(String name) {
+        return getBoolean(name, Boolean.FALSE);
+    }
+
     public boolean getBoolean(String name, boolean defaultValue) {
-        String valueString = get(name);
-        if ("true".equalsIgnoreCase(valueString)) {
-            return true;
-        } else if ("false".equalsIgnoreCase(valueString)) {
-            return false;
+        String value = getString(name);
+        if ("true".equalsIgnoreCase(value)) {
+            return Boolean.TRUE;
+        } else if ("false".equalsIgnoreCase(value)) {
+            return Boolean.FALSE;
         } else {
             return defaultValue;
         }
     }
 
-    /**
-     * 将name属性的值设置为布尔型。
-     * @param name
-     * @param value
-     */
     public void setBoolean(String name, boolean value) {
         set(name, Boolean.toString(value));
     }
 
-    /**
-     * 以字符串数组的形式返回name属性的值。如果没有指定此类属性，则返回null。值由空格或逗号分隔。
-     * @param name
-     * @return
-     */
+    /************************* Array *******************/
+
     public String[] getStrings(String name) {
-        String valueString = get(name);
-        if (valueString == null) {
-            return null;
+        return getStrings(name, "");
+    }
+
+    public String[] getStrings(String name, String defaultValue) {
+        String value = getString(name);
+        if (value == null) {
+            value = defaultValue;
         }
-        StringTokenizer tokenizer = new StringTokenizer(valueString, ", \t\n\r\f");
-        List<String> values = new ArrayList<String>();
+        if (value == null || value.length() == 0) {
+            return new String[0];
+        }
+        StringTokenizer tokenizer = new StringTokenizer(value, ", \t\n\r\f");
+        List<String> values = new ArrayList<>();
         while (tokenizer.hasMoreTokens()) {
             values.add(tokenizer.nextToken());
         }
         return values.toArray(new String[values.size()]);
     }
 
-    /**
-     * 作为类返回name属性的值。如果没有指定此类属性，则返回defaultValue。
-     * @param name
-     * @param defaultValue
-     * @return
-     */
+    /************************* Class *******************/
+
     public Class getClass(String name, Class defaultValue) {
-        String valueString = get(name);
-        if (valueString == null) {
+        String value = getString(name);
+        if (value == null || value.length() == 0) {
             return defaultValue;
         }
         try {
-            return Class.forName(valueString);
+            return Class.forName(value);
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            return defaultValue;
         }
     }
 
     /**
-     * 作为类返回name属性的值。如果没有指定此类属性，则返回defaultValue。如果返回的类没有实现指定的接口，则会引发错误。
-     * @param name         属性名
-     * @param defaultValue 配置不存在时默认的类
-     * @param xface        配置类的父类
+     * 增加父类限制
+     * @param name
+     * @param defaultValue
+     * @param xface
      * @return
      */
     public Class getClass(String name, Class defaultValue, Class xface) {
@@ -351,7 +361,7 @@ public class Configuration {
      * 获得配置集合对象
      * @return
      */
-    private synchronized Properties getProps() {
+    public synchronized Properties getProps() {
         if (props == null) {
             builder();
         }
@@ -370,7 +380,7 @@ public class Configuration {
         return sb.toString();
     }
 
-    private void toString(ArrayList<Object> resources, StringBuffer sb) {
+    private void toString(List<Object> resources, StringBuffer sb) {
         ListIterator<Object> i = resources.listIterator();
         while (i.hasNext()) {
             if (i.nextIndex() != 0) {
