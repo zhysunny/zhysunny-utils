@@ -41,7 +41,7 @@ public class ExecuteLocalCmd {
     }
 
     public static void main(String[] args) throws Exception {
-        String[] cmd = new String[]{"cmd", "", "ipconfig"};
+        String[] cmd = new String[]{"ipconfig"};
         System.out.println(executeCmd(cmd));
     }
 }

@@ -19,7 +19,7 @@ package com.zhysunny.io.conf;
 import com.zhysunny.io.properties.PropertiesConstant;
 import com.zhysunny.io.properties.PropertiesReader;
 import com.zhysunny.io.xml.XmlReader;
-import com.zhysunny.io.xml.reader.XmlToConfiguration;
+import com.zhysunny.io.xml.reader.XmlToProperties;
 import java.io.File;
 import java.net.URL;
 import java.util.*;
@@ -36,7 +36,7 @@ public class Configuration {
     /**
      * 配置集合
      */
-    private Properties properties;
+    private Properties props;
     /**
      * 类加载器
      */
@@ -95,13 +95,13 @@ public class Configuration {
      */
     private synchronized void addResource(ArrayList<Object> resources, Object resource) {
         resources.add(resource);
-        properties = null;
+        props = null;
     }
 
     public Configuration builder() {
-        properties = new Properties();
-        loadResources(properties, defaultResources);
-        loadResources(properties, finalResources);
+        props = new Properties();
+        loadResources(props, defaultResources);
+        loadResources(props, finalResources);
         return this;
     }
 
@@ -114,14 +114,14 @@ public class Configuration {
         for (Object obj : resources) {
             if (obj.toString().endsWith(".xml")) {
                 try {
-                    Properties prop = (Properties)new XmlReader(obj).read(new XmlToConfiguration());
+                    Properties prop = (Properties)new XmlReader(obj).read(new XmlToProperties());
                     props.putAll(prop);
                 } catch (Exception e) {
                     throw new RuntimeException("配置文件加载异常：" + obj);
                 }
-            } else if (obj.toString().endsWith(".properties")) {
+            } else if (obj.toString().endsWith(".props")) {
                 try {
-                    Properties prop = new PropertiesReader(obj).builder().getProp();
+                    Properties prop = new PropertiesReader(obj).builder().getProps();
                     props.putAll(prop);
                 } catch (Exception e) {
                     throw new RuntimeException("配置文件加载异常：" + obj);
@@ -352,10 +352,10 @@ public class Configuration {
      * @return
      */
     private synchronized Properties getProps() {
-        if (properties == null) {
+        if (props == null) {
             builder();
         }
-        return properties;
+        return props;
     }
 
     @Override
@@ -394,7 +394,7 @@ public class Configuration {
         PropertiesReader reader = new PropertiesReader(getProps());
         reader.translate();
         reader.toConstant(clz);
-        properties = null;
+        props = null;
     }
 
 }
