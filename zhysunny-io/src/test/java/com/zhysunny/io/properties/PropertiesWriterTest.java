@@ -1,7 +1,5 @@
 package com.zhysunny.io.properties;
 
-import static org.junit.Assert.*;
-
 import com.zhysunny.io.properties.constant.Constant;
 import org.junit.*;
 
@@ -43,7 +41,7 @@ public class PropertiesWriterTest {
     @Test
     public void testWriteForPropComment() throws Exception {
         PropertiesReader reader = new PropertiesReader(input).builder();
-        Properties prop = reader.getProp();
+        Properties prop = reader.getProps();
         System.out.println(prop);
         PropertiesWriter writer = new PropertiesWriter(output);
         writer.write(prop, "prop test");

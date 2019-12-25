@@ -24,24 +24,24 @@ public class PropertiesWriter extends BaseWriter {
 
     /**
      * 默认不追加写入
-     * @param prop
+     * @param props
      * @param comment
      * @throws Exception
      */
-    public void write(Properties prop, String comment) throws Exception {
-        write(prop, comment, false);
+    public void write(Properties props, String comment) throws Exception {
+        write(props, comment, false);
     }
 
     /**
      * 写入Properties文件
-     * @param prop
+     * @param props
      * @param comment
      * @param append
      * @throws Exception
      */
-    public void write(Properties prop, String comment, boolean append) throws Exception {
+    public void write(Properties props, String comment, boolean append) throws Exception {
         FileOutputStream fos = new FileOutputStream(file, append);
-        prop.store(fos, comment);
+        props.store(fos, comment);
         fos.close();
     }
 

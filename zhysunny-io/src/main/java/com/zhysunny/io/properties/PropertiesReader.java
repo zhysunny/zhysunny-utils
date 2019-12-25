@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
  */
 public class PropertiesReader extends BaseReader {
 
-    private Properties prop;
+    private Properties props;
 
     public PropertiesReader(Object... resources) {
         super(resources);
@@ -29,32 +29,32 @@ public class PropertiesReader extends BaseReader {
         super(resources);
     }
 
-    public PropertiesReader(Properties prop) {
-        this.prop = prop;
+    public PropertiesReader(Properties props) {
+        this.props = props;
     }
 
     @Override
     public PropertiesReader builder() throws Exception {
         try {
-            prop = new Properties();
+            props = new Properties();
             for (Object resource : resources) {
                 if (resource instanceof URL) {
                     URL url = (URL)resource;
-                    prop.load(url.openStream());
+                    props.load(url.openStream());
                 } else if (resource instanceof File) {
                     File file = (File)resource;
-                    prop.load(new FileInputStream(file));
+                    props.load(new FileInputStream(file));
                 } else if (resource instanceof String) {
                     File file = new File((String)resource);
                     URL url = Thread.currentThread().getContextClassLoader().getResource((String)resource);
                     if (url != null) {
-                        prop.load(url.openStream());
+                        props.load(url.openStream());
                     } else {
-                        prop.load(new FileInputStream(file));
+                        props.load(new FileInputStream(file));
                     }
                 } else if (resource instanceof InputStream) {
                     InputStream is = (InputStream)resource;
-                    prop.load(is);
+                    props.load(is);
                 } else {
                     throw new RuntimeException("不支持的资源配置类型：" + resource.getClass());
                 }
@@ -68,9 +68,9 @@ public class PropertiesReader extends BaseReader {
 
     private static final Pattern PATTERN = Pattern.compile("\\$\\{([^\\}]+)\\}");
 
-    public void translate() {
+    public PropertiesReader translate() {
         Matcher matcher = null;
-        for (Map.Entry<Object, Object> entry : prop.entrySet()) {
+        for (Map.Entry<Object, Object> entry : props.entrySet()) {
             if (entry.getKey() == null || entry.getValue() == null) {
                 continue;
             }
@@ -80,22 +80,23 @@ public class PropertiesReader extends BaseReader {
             while (matcher.find()) {
                 String matcherKey = matcher.group();
                 matcherKey = matcherKey.substring(2, matcherKey.length() - 1);
-                String matchervalue = prop.getProperty(matcherKey);
+                String matchervalue = props.getProperty(matcherKey);
                 if (matchervalue != null) {
                     matcher.appendReplacement(buffer, matchervalue);
                 }
             }
             matcher.appendTail(buffer);
-            prop.setProperty(entry.getKey().toString(), buffer.toString());
+            props.setProperty(entry.getKey().toString(), buffer.toString());
         }
+        return this;
     }
 
-    public Properties getProp() {
-        return prop;
+    public Properties getProps() {
+        return props;
     }
 
     public <T> T toConstant(Class<T> clz) throws Exception {
-        if (prop == null) {
+        if (props == null) {
             builder();
         }
         if (!PropertiesConstant.class.isAssignableFrom(clz)) {
@@ -108,7 +109,7 @@ public class PropertiesReader extends BaseReader {
             PropKey propKey = field.getAnnotation(PropKey.class);
             if (propKey != null) {
                 String key = propKey.key();
-                String value = prop.getProperty(key);
+                String value = props.getProperty(key);
                 if (value == null) {
                     // 使用默认值
                     value = propKey.defaultValue();
