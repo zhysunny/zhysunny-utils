@@ -11,7 +11,7 @@ import java.util.*;
  * @author 章云
  * @date 2019/7/26 13:35
  */
-public class XmlToConfiguration extends BaseXmlToAny {
+public class XmlToProperties extends BaseXmlToAny {
 
     @Override
     public Properties read(XmlReader reader, Object... params) {

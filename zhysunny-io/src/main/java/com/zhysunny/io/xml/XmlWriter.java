@@ -4,6 +4,7 @@ import com.zhysunny.io.BaseWriter;
 import com.zhysunny.io.xml.writer.BaseAnyToXml;
 import com.zhysunny.io.xml.writer.BeanToXml;
 import com.zhysunny.io.xml.writer.MapToXml;
+import com.zhysunny.io.xml.writer.PropertiesToXml;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -19,6 +20,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -49,6 +51,10 @@ public class XmlWriter extends BaseWriter {
 
     public void write(Map<String, Object> data) throws Exception {
         write(new MapToXml(), data);
+    }
+
+    public void write(Properties props) throws Exception {
+        write(new PropertiesToXml(), props);
     }
 
     public void write(XmlBean bean, String encoding) throws Exception {
