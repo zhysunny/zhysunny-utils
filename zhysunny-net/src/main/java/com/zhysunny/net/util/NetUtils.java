@@ -81,18 +81,6 @@ public class NetUtils {
         return ipList;
     }
 
-    public static void close(Closeable... streams) {
-        for (Closeable stream : streams) {
-            try {
-                if (null != stream) {
-                    stream.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     public static void main(String[] args) {
         String ipString = "192.168.31.10,192.168.31.11-192.168.31.50,192.168.31.129-138";
         System.out.println(splitIp(ipString));
