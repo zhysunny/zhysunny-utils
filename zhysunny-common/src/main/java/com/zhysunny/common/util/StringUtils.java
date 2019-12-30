@@ -270,6 +270,8 @@ public class StringUtils {
                     return false;
                 } else if (param instanceof byte[] && (((byte[])param).length != 0)) {
                     return false;
+                } else {
+                    throw new RuntimeException("无法判空的对象" + param.getClass());
                 }
             }
         }
