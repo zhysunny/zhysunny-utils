@@ -1,25 +1,9 @@
-/**
- * Copyright 2005 The Apache Software Foundation
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.zhysunny.io.conf;
 
 import com.zhysunny.io.properties.PropertiesConstant;
 import com.zhysunny.io.properties.PropertiesReader;
 import com.zhysunny.io.xml.XmlReader;
-import com.zhysunny.io.xml.reader.XmlToConfiguration;
+import com.zhysunny.io.xml.reader.XmlToProperties;
 import java.io.File;
 import java.util.*;
 
@@ -35,7 +19,7 @@ public class Configuration {
     /**
      * 配置集合
      */
-    private Properties properties;
+    private Properties props;
 
     private static class Inner {
 
@@ -80,13 +64,13 @@ public class Configuration {
      */
     private synchronized void addResource(List<Object> list, Object... resources) {
         Arrays.stream(resources).forEach(resource -> list.add(resource));
-        properties = null;
+        props = null;
     }
 
     public Configuration builder() {
-        properties = new Properties();
-        loadResources(properties, defaultResources);
-        loadResources(properties, finalResources);
+        props = new Properties();
+        loadResources(props, defaultResources);
+        loadResources(props, finalResources);
         return this;
     }
 
@@ -99,14 +83,14 @@ public class Configuration {
         for (Object obj : resources) {
             if (obj.toString().endsWith(".xml")) {
                 try {
-                    Properties prop = (Properties)new XmlReader(obj).read(new XmlToConfiguration());
+                    Properties prop = (Properties)new XmlReader(obj).read(new XmlToProperties());
                     props.putAll(prop);
                 } catch (Exception e) {
                     throw new RuntimeException("配置文件加载异常：" + obj);
                 }
             } else if (obj.toString().endsWith(".properties")) {
                 try {
-                    Properties prop = new PropertiesReader(obj).builder().getProp();
+                    Properties prop = new PropertiesReader(obj).builder().getProps();
                     props.putAll(prop);
                 } catch (Exception e) {
                     throw new RuntimeException("配置文件加载异常：" + obj);
@@ -358,10 +342,10 @@ public class Configuration {
      * @return
      */
     public synchronized Properties getProps() {
-        if (properties == null) {
+        if (props == null) {
             builder();
         }
-        return properties;
+        return props;
     }
 
     @Override
@@ -400,7 +384,7 @@ public class Configuration {
         PropertiesReader reader = new PropertiesReader(getProps());
         reader.translate();
         reader.toConstant(clz);
-        properties = null;
+        props = null;
     }
 
 }

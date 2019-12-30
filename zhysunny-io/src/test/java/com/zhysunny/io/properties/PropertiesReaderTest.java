@@ -1,12 +1,11 @@
 package com.zhysunny.io.properties;
 
-import static org.junit.Assert.*;
-
 import com.zhysunny.io.properties.constant.Constant;
 import org.junit.*;
 
 import java.util.Arrays;
 import java.util.Properties;
+import static org.junit.Assert.*;
 
 /**
  * PropertiesReader Test.
@@ -44,8 +43,9 @@ public class PropertiesReaderTest {
     @Test
     public void testToConstant() throws Exception {
         PropertiesReader reader = new PropertiesReader(path).builder();
-        Properties prop = reader.getProp();
+        Properties prop = reader.getProps();
         System.out.println(prop);
+        assertEquals(prop.getProperty("address"), "192.168.8.2:2181:/hbase");
         reader.toConstant(Constant.class);
         System.out.println(Constant.address);
         System.out.println(Constant.value);

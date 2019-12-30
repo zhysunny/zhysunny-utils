@@ -7,15 +7,15 @@ import java.net.URL;
 import java.util.Properties;
 
 /**
- * XmlToConfiguration Test.
+ * XmlToProperties Test.
  * @author 章云
  * @date 2019/11/8 14:43
  */
-public class XmlToConfigurationTest {
+public class XmlToPropertiesTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        System.out.println("Test XmlToConfiguration Class Start...");
+        System.out.println("Test XmlToProperties Class Start...");
     }
 
     @Before
@@ -28,7 +28,7 @@ public class XmlToConfigurationTest {
 
     @AfterClass
     public static void afterClass() throws Exception {
-        System.out.println("Test XmlToConfiguration Class End...");
+        System.out.println("Test XmlToProperties Class End...");
     }
 
     /**
@@ -37,7 +37,7 @@ public class XmlToConfigurationTest {
     @Test
     public void testRead() throws Exception {
         URL url = Thread.currentThread().getContextClassLoader().getResource("xml/config.xml");
-        Properties properties = (Properties)new XmlReader(url).read(new XmlToConfiguration());
+        Properties properties = (Properties)new XmlReader(url).read(new XmlToProperties());
         assertEquals(properties.size(), 2);
         assertEquals(properties.getProperty("name1"), "value1");
         assertEquals(properties.getProperty("name2"), "value2");
