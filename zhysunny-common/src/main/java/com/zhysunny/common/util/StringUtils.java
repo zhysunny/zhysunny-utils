@@ -10,7 +10,8 @@ import java.util.Map;
  */
 public class StringUtils {
 
-    private StringUtils() {}
+    private StringUtils() {
+    }
 
     /**
      * 判断传入参数是否是byte
@@ -219,13 +220,26 @@ public class StringUtils {
      * @param params
      * @return
      */
-    public static boolean isEmptyParamOne(String... params) {
+    @SuppressWarnings("rawtypes")
+    public static boolean isEmptyParamOne(final Object... params) {
         if (null == params || 0 == params.length) {
             return true;
         }
-        for (String param : params) {
-            if (param == null || "".equals(param) || "undefined".equals(param)) {
+        for (Object param : params) {
+            if (param == null) {
                 return true;
+            } else {
+                if (param instanceof String && "".equals(param)) {
+                    return true;
+                } else if (param instanceof Object[] && (((Object[])param).length == 0)) {
+                    return true;
+                } else if (param instanceof Collection && ((Collection)param).isEmpty()) {
+                    return true;
+                } else if (param instanceof Map && ((Map)param).isEmpty()) {
+                    return true;
+                } else if (param instanceof byte[] && (((byte[])param).length == 0)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -237,47 +251,27 @@ public class StringUtils {
      * @param params
      * @return
      */
-    public static boolean isEmptyParamAll(final String... params) {
-        if (null == params || 0 == params.length) {
-            return true;
-        }
-        for (String param : params) {
-            if (param != null && !"".equals(param) && !"undefined".equals(param)) {
-                // 有一个不为空返回false
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * 有一个参数为空返回true
-     * @param params
-     * @return true 存在对象为空 ： false 对象都不为空或不为空串
-     */
     @SuppressWarnings("rawtypes")
-    public static boolean isEmptyParam(final Object... params) {
+    public static boolean isEmptyParamAll(final Object... params) {
         if (null == params || 0 == params.length) {
             return true;
         }
         for (Object param : params) {
-            if (param == null) {
-                return true;
-            } else {
-                if (param instanceof String) {
-                    if ("".equals(param) || "undefined".equals(param)) {
-                        return true;
-                    }
-                } else if (param instanceof Object[] && (((Object[])param).length == 0)) {
-                    return true;
-                } else if (param instanceof Collection && ((Collection)param).isEmpty()) {
-                    return true;
-                } else if (param instanceof Map && ((Map)param).isEmpty()) {
-                    return true;
+            if (param != null) {
+                if (param instanceof String && !"".equals(param)) {
+                    return false;
+                } else if (param instanceof Object[] && (((Object[])param).length != 0)) {
+                    return false;
+                } else if (param instanceof Collection && !((Collection)param).isEmpty()) {
+                    return false;
+                } else if (param instanceof Map && !((Map)param).isEmpty()) {
+                    return false;
+                } else if (param instanceof byte[] && (((byte[])param).length != 0)) {
+                    return false;
                 }
             }
         }
-        return false;
+        return true;
     }
 
 }
