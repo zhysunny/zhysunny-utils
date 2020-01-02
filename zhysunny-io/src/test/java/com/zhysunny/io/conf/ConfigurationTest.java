@@ -1,8 +1,6 @@
 package com.zhysunny.io.conf;
 
 import static org.junit.Assert.*;
-
-import com.zhysunny.io.properties.constant.Constant;
 import org.junit.*;
 
 import java.util.Arrays;
@@ -33,12 +31,14 @@ public class ConfigurationTest {
     }
 
     @Test
-    public void testMain() throws Exception {
-//        new Configuration(Constant.class);
-        System.out.println(Constant.value);
-        System.out.println(Constant.value1);
-        System.out.println(Constant.value2);
-        System.out.println(Arrays.toString(Constant.array));
+    public void testSetDefaultValue() throws Exception {
+        Configuration conf = Configuration.getInstance();
+        conf.addDefaultResource("properties/input.properties");
+        assertEquals(conf.getString(Constant.VALUE), "value");
+        assertNull(conf.getString(Constant.DEFAULT));
+        conf.setDefaultValue(Constant.class);
+        assertEquals(conf.getString(Constant.DEFAULT), "20");
+        assertEquals(conf.getInt(Constant.DEFAULT), 20);
     }
 
 }

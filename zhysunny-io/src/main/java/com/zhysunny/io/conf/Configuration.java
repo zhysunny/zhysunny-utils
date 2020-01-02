@@ -5,6 +5,7 @@ import com.zhysunny.io.properties.PropertiesReader;
 import com.zhysunny.io.xml.XmlReader;
 import com.zhysunny.io.xml.reader.XmlToProperties;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -385,6 +386,35 @@ public class Configuration {
         reader.translate();
         reader.toConstant(clz);
         props = null;
+    }
+
+    /**
+     * 给常量类设置默认值
+     * @param clz
+     */
+    public void setDefaultValue(Class<?> clz) {
+        // 所有公共字段
+        Field[] fields = clz.getFields();
+        for (Field field : fields) {
+            field.setAccessible(true);
+            DefaultValue annotation = field.getAnnotation(DefaultValue.class);
+            if (annotation == null) {
+                continue;
+            }
+            // 注解配置的默认值
+            String defaultValue = annotation.value();
+            String key = null;
+            try {
+                // properties配置的key值
+                key = (String)field.get(clz);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            String value = props.getProperty(key);
+            if (value == null || value.trim().length() == 0) {
+                props.setProperty(key, defaultValue);
+            }
+        }
     }
 
 }
