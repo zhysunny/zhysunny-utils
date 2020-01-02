@@ -32,7 +32,9 @@ public class ExecuteLocalCmd {
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            NetUtils.close(br);
+            if (br != null) {
+                br.close();
+            }
             if (process != null) {
                 process.destroy();
             }
@@ -41,7 +43,8 @@ public class ExecuteLocalCmd {
     }
 
     public static void main(String[] args) throws Exception {
-        String[] cmd = new String[]{"ipconfig"};
+        String[] cmd = new String[]{ "ipconfig" };
         System.out.println(executeCmd(cmd));
     }
+
 }

@@ -17,6 +17,7 @@ import com.zhysunny.net.util.NetUtils;
  * @date 2019/7/27 23:44
  */
 public class SshConnection {
+
     /**
      * 当前正在连接的ip
      */
@@ -98,7 +99,9 @@ public class SshConnection {
         } catch (IOException e) {
             throw new IOException("发送SSH命令失败", e);
         } finally {
-            NetUtils.close(br);
+            if (br != null) {
+                br.close();
+            }
             if (session != null) {
                 session.close();
             }

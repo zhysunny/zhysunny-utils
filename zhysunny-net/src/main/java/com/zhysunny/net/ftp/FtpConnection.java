@@ -126,7 +126,9 @@ public class FtpConnection {
             result = false;
             throw new IOException("FTP上传异常", e);
         } finally {
-            NetUtils.close(fis);
+            if (fis != null) {
+                fis.close();
+            }
         }
         if (num > 0) {
             for (int i = 0; i < num; i++) {
@@ -173,7 +175,12 @@ public class FtpConnection {
             result = false;
             throw new IOException("FTP下载异常", e);
         } finally {
-            NetUtils.close(is, fos);
+            if (is != null) {
+                is.close();
+            }
+            if (fos != null) {
+                fos.close();
+            }
         }
         return result;
     }

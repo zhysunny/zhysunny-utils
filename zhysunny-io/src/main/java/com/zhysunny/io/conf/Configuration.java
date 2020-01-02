@@ -67,7 +67,7 @@ public class Configuration {
         props = null;
     }
 
-    public Configuration builder() {
+    private Configuration builder() {
         props = new Properties();
         loadResources(props, defaultResources);
         loadResources(props, finalResources);
