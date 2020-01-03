@@ -5,7 +5,9 @@ import com.zhysunny.io.properties.PropertiesReader;
 import com.zhysunny.io.xml.XmlReader;
 import com.zhysunny.io.xml.reader.XmlToProperties;
 import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -38,23 +40,43 @@ public class Configuration {
         return Inner.INSTANCE;
     }
 
-    /**
-     * 支持String(File,URL),File,URL,InputStream
-     * @param resources
-     * @return
-     */
-    public Configuration addDefaultResource(Object... resources) {
-        addResource(defaultResources, resources);
+    public Configuration addDefaultResource(String name) {
+        addResource(defaultResources, name);
         return this;
     }
 
-    /**
-     * 支持String(File,URL),File,URL,InputStream
-     * @param resources
-     * @return
-     */
-    public Configuration addFinalResource(Object... resources) {
-        addResource(finalResources, resources);
+    public Configuration addDefaultResource(File file) {
+        addResource(defaultResources, file);
+        return this;
+    }
+
+    public Configuration addDefaultResource(URL url) {
+        addResource(defaultResources, url);
+        return this;
+    }
+
+    public Configuration addDefaultResource(InputStream is) {
+        addResource(defaultResources, is);
+        return this;
+    }
+
+    public Configuration addFinalResource(String name) {
+        addResource(finalResources, name);
+        return this;
+    }
+
+    public Configuration addFinalResource(File file) {
+        addResource(finalResources, file);
+        return this;
+    }
+
+    public Configuration addFinalResource(URL url) {
+        addResource(finalResources, url);
+        return this;
+    }
+
+    public Configuration addFinalResource(InputStream is) {
+        addResource(finalResources, is);
         return this;
     }
 
