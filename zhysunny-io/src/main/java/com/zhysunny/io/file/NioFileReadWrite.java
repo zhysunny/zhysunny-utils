@@ -53,7 +53,7 @@ public class NioFileReadWrite implements FileReadWrite<String> {
     }
 
     @Override
-    public void write(List<String> datas) throws IOException {
+    public Object write(List<String> datas) throws IOException {
         OpenOption option;
         if (append) {
             option = StandardOpenOption.APPEND;
@@ -68,12 +68,18 @@ public class NioFileReadWrite implements FileReadWrite<String> {
         } catch (IOException e) {
             throw e;
         }
+        return datas.size();
     }
 
     @Override
-    public void write(Map<String, String> datas) throws IOException {
+    public Object write(Map<String, String> datas) throws IOException {
         List<String> collect = datas.entrySet().stream().map(entry -> entry.getKey() + "\t" + entry.getValue()).collect(toList());
-        write(collect);
+        return write(collect);
+    }
+
+    @Override
+    public File getFile() {
+        return this.file;
     }
 
 }

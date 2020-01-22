@@ -54,7 +54,7 @@ public class OioFileReadWrite implements FileReadWrite<String> {
     }
 
     @Override
-    public void write(List<String> datas) throws IOException {
+    public Object write(List<String> datas) throws IOException {
         try (final FileOutputStream fos = new FileOutputStream(file, append)) {
             for (String data : datas) {
                 fos.write((data + "\n").getBytes());
@@ -62,12 +62,18 @@ public class OioFileReadWrite implements FileReadWrite<String> {
         } catch (IOException e) {
             throw e;
         }
+        return datas.size();
     }
 
     @Override
-    public void write(Map<String, String> datas) throws IOException {
+    public Object write(Map<String, String> datas) throws IOException {
         List<String> collect = datas.entrySet().stream().map(entry -> entry.getKey() + "\t" + entry.getValue()).collect(toList());
-        write(collect);
+        return write(collect);
+    }
+
+    @Override
+    public File getFile() {
+        return this.file;
     }
 
 }
