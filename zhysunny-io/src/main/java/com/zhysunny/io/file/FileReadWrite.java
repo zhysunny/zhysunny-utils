@@ -2,6 +2,7 @@ package com.zhysunny.io.file;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 文件读写
@@ -19,7 +20,15 @@ public interface FileReadWrite<E> {
     /**
      * 文件写
      * @param datas
+     * @throws IOException
      */
     void write(List<E> datas) throws IOException;
+
+    /**
+     * 文件写
+     * @param datas
+     * @throws IOException
+     */
+    void write(Map<String, E> datas) throws IOException;
 
 }
