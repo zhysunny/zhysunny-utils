@@ -13,7 +13,8 @@ import java.util.TimeZone;
  */
 public class DateUtils {
 
-    private DateUtils() {}
+    private DateUtils() {
+    }
 
     public static final String DATE_FORMAT_DATETIME = "yyyy-MM-dd HH:mm:ss";
     public static final String DATE_FORMAT_DATE = "yyyyMMdd";
@@ -242,6 +243,32 @@ public class DateUtils {
         SimpleDateFormat sdf = new SimpleDateFormat(formate);
         sdf.setTimeZone(TimeZone.getTimeZone(timeZoneId));
         return sdf.parse(date);
+    }
+
+    /**
+     * 获取时间长度，默认参数单位是秒
+     * @param seconds
+     * @return
+     */
+    public static String getLengthOfTime(long seconds) {
+        StringBuilder sb = new StringBuilder();
+        if (seconds >= 60) {
+            long minutes = seconds / 60;
+            seconds = seconds % 60;
+            if (minutes >= 60) {
+                long hours = minutes / 60;
+                minutes = minutes % 60;
+                if (hours >= 24) {
+                    long day = hours / 24;
+                    hours = hours % 24;
+                    sb.append(day).append(" 天 ");
+                }
+                sb.append(hours).append(" 小时 ");
+            }
+            sb.append(minutes).append(" 分钟 ");
+        }
+        sb.append(seconds).append(" 秒");
+        return sb.toString();
     }
 
     public static void main(String[] args) throws ParseException {
