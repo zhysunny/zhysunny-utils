@@ -4,6 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>com.zhysunny.pom</groupId>
+        <artifactId>zhysunny-parent</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
     <groupId>com.zhysunny.utils</groupId>
     <artifactId>zhysunny-utils</artifactId>
     <packaging>pom</packaging>
@@ -13,6 +19,7 @@
         <module>zhysunny-io</module>
         <module>zhysunny-net</module>
         <module>zhysunny-driver</module>
+        <module>zhysunny-commons</module>
     </modules>
     <name>Zhysunny Utils</name>
     <description>公共工具类</description>
