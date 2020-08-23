@@ -20,6 +20,7 @@
         <module>zhysunny-net</module>
         <module>zhysunny-driver</module>
         <module>zhysunny-commons</module>
+        <module>zhysunny-rest</module>
     </modules>
     <name>Zhysunny Utils</name>
     <description>公共工具类</description>
