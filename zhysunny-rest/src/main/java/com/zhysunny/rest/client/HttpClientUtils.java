@@ -111,11 +111,13 @@ public class HttpClientUtils {
         try (CloseableHttpClient client = HttpClientBuilder.create().build();
              CloseableHttpResponse response = client.execute(httpRequest)) {
             int statusCode = response.getStatusLine().getStatusCode();
-            reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8));
             StringBuilder content = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                content.append(line);
+            if (response.getEntity() != null) {
+                reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    content.append(line);
+                }
             }
             return new RestResponse(statusCode, content.toString());
         } catch (Exception e) {
