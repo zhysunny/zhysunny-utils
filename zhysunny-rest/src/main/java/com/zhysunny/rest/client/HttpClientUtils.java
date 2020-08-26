@@ -106,6 +106,8 @@ public class HttpClientUtils {
 
     private static RestResponse client(HttpRequestBase httpRequest) throws IOException {
         BufferedReader reader = null;
+        httpRequest.setHeader("Content-Type", "application/json;charset=UTF-8");
+        httpRequest.setHeader("Accept", "application/json;charset=UTF-8");
         try (CloseableHttpClient client = HttpClientBuilder.create().build();
              CloseableHttpResponse response = client.execute(httpRequest)) {
             int statusCode = response.getStatusLine().getStatusCode();
