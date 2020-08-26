@@ -13,12 +13,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${groupId}</groupId>
+            <artifactId>zhysunny-common</artifactId>
         </dependency>
     </dependencies>
 
