@@ -13,6 +13,9 @@ public class JsonUtils {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
+    static {
+    }
+
     public static String toJson(Object obj) throws JsonProcessingException {
         return MAPPER.writeValueAsString(obj);
     }
