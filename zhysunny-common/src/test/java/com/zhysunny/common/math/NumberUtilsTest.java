@@ -46,15 +46,4 @@ public class NumberUtilsTest {
         assertThat(NumberUtils.isEven(3)).isFalse();
     }
 
-    @Test
-    public void testAbs() throws Exception {
-        assertThat(NumberUtils.abs(0)).isEqualTo(0);
-        assertThat(NumberUtils.abs(5)).isEqualTo(5);
-        assertThat(NumberUtils.abs(-5)).isEqualTo(5);
-        assertThat(NumberUtils.abs(Integer.MAX_VALUE)).isEqualTo(Integer.MAX_VALUE);
-        assertThat(NumberUtils.abs(Integer.MIN_VALUE + 1)).isEqualTo(Integer.MAX_VALUE);
-
-        assertThat(NumberUtils.abs(Integer.MIN_VALUE)).isEqualTo(Integer.MIN_VALUE);
-    }
-
 } 
